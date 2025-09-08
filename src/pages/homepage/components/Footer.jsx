@@ -91,11 +91,11 @@ const Footer = () => {
               </div>
               <div className="flex items-center space-x-3">
                 <Icon name="Phone" size={16} className="text-blue-400" />
-                <span className="text-sm text-gray-300">+34 900 123 456</span>
+                <span className="text-sm text-gray-300">+1 800 555 1234</span>
               </div>
               <div className="flex items-center space-x-3">
                 <Icon name="MapPin" size={16} className="text-blue-400" />
-                <span className="text-sm text-gray-300">Madrid, España</span>
+                <span className="text-sm text-gray-300">New York, Estados Unidos</span>
               </div>
             </div>
 

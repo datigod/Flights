@@ -1,57 +1,34 @@
 import React, { useState, useEffect } from 'react';
 import Icon from '../../../components/AppIcon';
+import api from '../../../utils/api';
 
 const ReliabilityTicker = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
-
-  const reliabilityAlerts = [
-    {
-      id: 1,
-      type: 'warning',
-      route: 'MAD → BCN',
-      airline: 'Iberia',
-      message: 'Retrasos promedio de 15 min debido a tráfico aéreo',
-      reliability: 78,
-      trend: 'down'
-    },
-    {
-      id: 2,
-      type: 'success',
-      route: 'BCN → CDG',
-      airline: 'Vueling',
-      message: 'Excelente puntualidad - 95% a tiempo esta semana',
-      reliability: 95,
-      trend: 'up'
-    },
-    {
-      id: 3,
-      type: 'info',
-      route: 'MAD → LHR',
-      airline: 'British Airways',
-      message: 'Condiciones meteorológicas favorables',
-      reliability: 88,
-      trend: 'stable'
-    },
-    {
-      id: 4,
-      type: 'warning',
-      route: 'BCN → FCO',
-      airline: 'Ryanair',
-      message: 'Posibles retrasos por mantenimiento de pista',
-      reliability: 72,
-      trend: 'down'
-    }
-  ];
+  const [reliabilityAlerts, setReliabilityAlerts] = useState([]);
 
   useEffect(() => {
+    const fetchAlerts = async () => {
+      try {
+        const { data } = await api.get('/flights/alerts');
+        setReliabilityAlerts(data?.alerts || []);
+      } catch (error) {
+        console.error('Error fetching alerts:', error);
+      }
+    };
+
+    fetchAlerts();
+  }, []);
+
+  useEffect(() => {
+    if (!reliabilityAlerts?.length) return;
     const interval = setInterval(() => {
-      setCurrentIndex((prevIndex) => 
-        (prevIndex + 1) % reliabilityAlerts?.length
+      setCurrentIndex((prevIndex) =>
+        (prevIndex + 1) % reliabilityAlerts.length
       );
     }, 4000);
 
     return () => clearInterval(interval);
-  }, [reliabilityAlerts?.length]);
+  }, [reliabilityAlerts.length]);
 
   const getAlertIcon = (type) => {
     switch (type) {
@@ -88,6 +65,10 @@ const ReliabilityTicker = () => {
   };
 
   const currentAlert = reliabilityAlerts?.[currentIndex];
+
+  if (!reliabilityAlerts.length) {
+    return null;
+  }
 
   return (
     <section className="bg-gray-50 border-y border-gray-200">
