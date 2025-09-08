@@ -5,6 +5,7 @@ import SearchResults from './components/SearchResults';
 import RouteIntelligenceSidebar from './components/RouteIntelligenceSidebar';
 import MethodologyExplainer from './components/MethodologyExplainer';
 import Icon from '../../components/AppIcon';
+import api from '../../utils/api';
 
 
 const ReliabilitySearchEngine = () => {
@@ -14,166 +15,18 @@ const ReliabilitySearchEngine = () => {
   const [showRouteIntelligence, setShowRouteIntelligence] = useState(false);
   const [routeIntelligenceData, setRouteIntelligenceData] = useState(null);
 
-  // Mock airline data
-  const mockAirlines = [
-    {
-      id: 1,
-      name: 'Iberia',
-      code: 'IB',
-      reliabilityScore: 92,
-      onTimePercentage: 89,
-      avgDelay: 12,
-      sampleSize: 156,
-      trend: 'up',
-      seasonalNote: 'Rendimiento excelente durante temporada alta de verano'
-    },
-    {
-      id: 2,
-      name: 'Lufthansa',
-      code: 'LH',
-      reliabilityScore: 88,
-      onTimePercentage: 85,
-      avgDelay: 18,
-      sampleSize: 203,
-      trend: 'stable',
-      seasonalNote: 'Consistente a lo largo del año con ligeras mejoras en primavera'
-    },
-    {
-      id: 3,
-      name: 'Air France',
-      code: 'AF',
-      reliabilityScore: 84,
-      onTimePercentage: 81,
-      avgDelay: 22,
-      sampleSize: 134,
-      trend: 'up',
-      seasonalNote: 'Mejoras significativas en los últimos 6 meses'
-    },
-    {
-      id: 4,
-      name: 'KLM',
-      code: 'KL',
-      reliabilityScore: 82,
-      onTimePercentage: 79,
-      avgDelay: 25,
-      sampleSize: 98,
-      trend: 'down',
-      seasonalNote: 'Impacto por obras en aeropuerto hub durante Q2'
-    },
-    {
-      id: 5,
-      name: 'British Airways',
-      code: 'BA',
-      reliabilityScore: 79,
-      onTimePercentage: 76,
-      avgDelay: 28,
-      sampleSize: 167,
-      trend: 'stable',
-      seasonalNote: 'Rendimiento estable con variaciones menores por temporada'
-    }
-  ];
-
-  // Mock route intelligence data
-  const mockRouteIntelligence = {
-    historicalTrends: [
-      {
-        period: 'Últimos 3 meses',
-        change: 5,
-        description: 'Mejora general en puntualidad debido a condiciones meteorológicas favorables'
-      },
-      {
-        period: 'Últimos 6 meses',
-        change: -2,
-        description: 'Ligera disminución por obras de infraestructura en aeropuertos'
-      },
-      {
-        period: 'Último año',
-        change: 8,
-        description: 'Tendencia positiva sostenida con implementación de nuevas tecnologías'
-      }
-    ],
-    impactFactors: [
-      { name: 'Condiciones meteorológicas', impact: 'medium' },
-      { name: 'Congestión del espacio aéreo', impact: 'high' },
-      { name: 'Obras aeroportuarias', impact: 'low' },
-      { name: 'Eventos estacionales', impact: 'medium' }
-    ],
-    seasonalPatterns: [
-      {
-        season: 'Primavera (Mar-May)',
-        reliability: 87,
-        description: 'Condiciones óptimas con menor tráfico y buen clima',
-        flightCount: 1240,
-        avgDelay: 15
-      },
-      {
-        season: 'Verano (Jun-Ago)',
-        reliability: 82,
-        description: 'Mayor tráfico pero condiciones meteorológicas estables',
-        flightCount: 1890,
-        avgDelay: 22
-      },
-      {
-        season: 'Otoño (Sep-Nov)',
-        reliability: 85,
-        description: 'Tráfico moderado con ocasionales disrupciones climáticas',
-        flightCount: 1456,
-        avgDelay: 18
-      },
-      {
-        season: 'Invierno (Dec-Feb)',
-        reliability: 79,
-        description: 'Condiciones más desafiantes por clima y menor visibilidad',
-        flightCount: 1123,
-        avgDelay: 28
-      }
-    ],
-    seasonalRecommendation: 'Para máxima confiabilidad, considera volar en primavera. Evita los meses de diciembre y enero si la puntualidad es crítica.',
-    forecast: [
-      {
-        timeframe: 'Próximos 30 días',
-        predictedReliability: 86,
-        confidence: 'high',
-        factors: 'Condiciones meteorológicas favorables y tráfico normal esperado'
-      },
-      {
-        timeframe: 'Próximos 90 días',
-        predictedReliability: 83,
-        confidence: 'medium',
-        factors: 'Entrada en temporada alta con posible aumento de tráfico'
-      },
-      {
-        timeframe: 'Próximos 6 meses',
-        predictedReliability: 81,
-        confidence: 'medium',
-        factors: 'Variaciones estacionales y posibles disrupciones por obras planificadas'
-      }
-    ],
-    trendAlert: 'Se espera una ligera disminución en la confiabilidad durante los próximos 3 meses debido al aumento del tráfico estacional.'
-  };
-
   const handleSearch = async (searchData) => {
     setIsLoading(true);
     setCurrentSearchQuery(searchData);
-    
-    // Simulate API call
-    setTimeout(() => {
-      // Filter and sort airlines based on search criteria
-      let filteredAirlines = [...mockAirlines];
-      
-      if (searchData?.minReliability) {
-        filteredAirlines = filteredAirlines?.filter(
-          airline => airline?.reliabilityScore >= parseInt(searchData?.minReliability)
-        );
-      }
-      
-      // Sort by reliability score
-      filteredAirlines?.sort((a, b) => b?.reliabilityScore - a?.reliabilityScore);
-      
-      setSearchResults(filteredAirlines);
-      setRouteIntelligenceData(mockRouteIntelligence);
+    try {
+      const { data } = await api.get('/flights', { params: searchData });
+      setSearchResults(data.airlines);
+      setRouteIntelligenceData(data.routeInfo);
+    } catch (error) {
+      console.error(error);
+    } finally {
       setIsLoading(false);
-    }, 1500);
+    }
   };
 
   const handleViewDetails = (airline) => {
