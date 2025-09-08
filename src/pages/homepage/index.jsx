@@ -14,7 +14,7 @@ const Homepage = () => {
       <Helmet>
         <title>AirlineReliability Pro - Vuela con Confianza Basada en Datos</title>
         <meta name="description" content="Plataforma líder en análisis de confiabilidad de aerolíneas. Transformamos datos complejos de aviación en insights accionables para viajeros inteligentes." />
-        <meta name="keywords" content="confiabilidad aerolíneas, puntualidad vuelos, análisis aviación, datos vuelos, España" />
+        <meta name="keywords" content="confiabilidad aerolíneas, puntualidad vuelos, análisis aviación, datos vuelos, Estados Unidos" />
         <meta property="og:title" content="AirlineReliability Pro - Vuela con Confianza Basada en Datos" />
         <meta property="og:description" content="Descubre qué aerolíneas son más confiables con nuestro análisis de más de 50,000 vuelos diarios" />
         <meta property="og:type" content="website" />

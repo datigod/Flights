@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Icon from '../../../components/AppIcon';
 import Input from '../../../components/ui/Input';
 import Button from '../../../components/ui/Button';
 import Select from '../../../components/ui/Select';
+import api from '../../../utils/api';
 
 const SearchForm = ({ onSearch, isLoading }) => {
   const [searchData, setSearchData] = useState({
@@ -13,18 +14,24 @@ const SearchForm = ({ onSearch, isLoading }) => {
     minReliability: ''
   });
 
-  const airportOptions = [
-    { value: 'MAD', label: 'Madrid (MAD) - Adolfo Suárez Madrid-Barajas' },
-    { value: 'BCN', label: 'Barcelona (BCN) - Barcelona-El Prat' },
-    { value: 'LHR', label: 'Londres (LHR) - Heathrow' },
-    { value: 'CDG', label: 'París (CDG) - Charles de Gaulle' },
-    { value: 'FCO', label: 'Roma (FCO) - Fiumicino' },
-    { value: 'FRA', label: 'Frankfurt (FRA) - Frankfurt am Main' },
-    { value: 'AMS', label: 'Ámsterdam (AMS) - Schiphol' },
-    { value: 'MUC', label: 'Múnich (MUC) - Franz Josef Strauss' },
-    { value: 'ZUR', label: 'Zúrich (ZUR) - Zurich Airport' },
-    { value: 'VIE', label: 'Viena (VIE) - Vienna International' }
-  ];
+  const [airportOptions, setAirportOptions] = useState([]);
+
+  useEffect(() => {
+    const fetchAirports = async () => {
+      try {
+        const { data } = await api.get('/airports');
+        const formatted = data?.map(airport => ({
+          value: airport?.code,
+          label: `${airport?.name} (${airport?.code}) - ${airport?.city}`
+        }));
+        setAirportOptions(formatted || []);
+      } catch (error) {
+        console.error('Error fetching airports:', error);
+      }
+    };
+
+    fetchAirports();
+  }, []);
 
   const timePreferenceOptions = [
     { value: '', label: 'Cualquier hora' },

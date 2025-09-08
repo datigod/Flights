@@ -1,91 +1,25 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 
 import Button from '../../../components/ui/Button';
+import api from '../../../utils/api';
 
 const Top3Preview = () => {
-  const sampleResults = [
-    {
-      route: 'Madrid → Barcelona',
-      date: '2025-01-15',
-      airlines: [
-        {
-          rank: 1,
-          name: 'Iberia',
-          logo: 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=100&h=100&fit=crop&crop=center',
-          reliability: 94,
-          confidence: 98,
-          onTimePercentage: 89,
-          avgDelay: '8 min',
-          flightCount: 156,
-          badge: 'Más Confiable'
-        },
-        {
-          rank: 2,
-          name: 'Vueling',
-          logo: 'https://images.unsplash.com/photo-1540962351504-03099e0a754b?w=100&h=100&fit=crop&crop=center',
-          reliability: 87,
-          confidence: 95,
-          onTimePercentage: 82,
-          avgDelay: '12 min',
-          flightCount: 203,
-          badge: 'Buena Opción'
-        },
-        {
-          rank: 3,
-          name: 'Ryanair',
-          logo: 'https://images.unsplash.com/photo-1569154941061-e231b4725ef1?w=100&h=100&fit=crop&crop=center',
-          reliability: 76,
-          confidence: 92,
-          onTimePercentage: 74,
-          avgDelay: '18 min',
-          flightCount: 98,
-          badge: 'Económica'
-        }
-      ]
-    },
-    {
-      route: 'Madrid → Londres',
-      date: '2025-01-15',
-      airlines: [
-        {
-          rank: 1,
-          name: 'British Airways',
-          logo: 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=100&h=100&fit=crop&crop=center',
-          reliability: 91,
-          confidence: 97,
-          onTimePercentage: 86,
-          avgDelay: '10 min',
-          flightCount: 124,
-          badge: 'Más Confiable'
-        },
-        {
-          rank: 2,
-          name: 'Iberia',
-          logo: 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=100&h=100&fit=crop&crop=center',
-          reliability: 88,
-          confidence: 96,
-          onTimePercentage: 83,
-          avgDelay: '11 min',
-          flightCount: 89,
-          badge: 'Confiable'
-        },
-        {
-          rank: 3,
-          name: 'easyJet',
-          logo: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=100&h=100&fit=crop&crop=center',
-          reliability: 79,
-          confidence: 93,
-          onTimePercentage: 76,
-          avgDelay: '16 min',
-          flightCount: 67,
-          badge: 'Económica'
-        }
-      ]
-    }
-  ];
-
+  const [routes, setRoutes] = React.useState([]);
   const [selectedRoute, setSelectedRoute] = React.useState(0);
+
+  React.useEffect(() => {
+    const fetchTopRoutes = async () => {
+      try {
+        const { data } = await api.get('/flights/top-routes');
+        setRoutes(data?.routes || []);
+      } catch (error) {
+        console.error('Error fetching top routes:', error);
+      }
+    };
+
+    fetchTopRoutes();
+  }, []);
 
   const getReliabilityColor = (score) => {
     if (score >= 90) return 'text-green-600 bg-green-50';
@@ -108,7 +42,16 @@ const Top3Preview = () => {
     }
   };
 
-  const currentRoute = sampleResults?.[selectedRoute];
+  const currentRoute = routes?.[selectedRoute];
+  if (!routes?.length) {
+    return (
+      <section className="bg-white py-16 lg:py-24">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <p className="text-center text-gray-600">Cargando rutas...</p>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="bg-white py-16 lg:py-24">
@@ -119,12 +62,12 @@ const Top3Preview = () => {
             Top 3 Aerolíneas por Confiabilidad
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
-            Descubre qué aerolíneas ofrecen la mejor puntualidad en las rutas más populares de España
+            Descubre qué aerolíneas ofrecen la mejor puntualidad en las rutas más populares de Estados Unidos
           </p>
 
           {/* Route Selector */}
           <div className="flex justify-center space-x-4 mb-8">
-            {sampleResults?.map((route, index) => (
+            {routes?.map((route, index) => (
               <button
                 key={index}
                 onClick={() => setSelectedRoute(index)}

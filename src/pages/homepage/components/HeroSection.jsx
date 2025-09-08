@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
 import Input from '../../../components/ui/Input';
+import api from '../../../utils/api';
 
 const HeroSection = () => {
   const [searchData, setSearchData] = useState({
@@ -10,13 +11,20 @@ const HeroSection = () => {
     destination: '',
     date: ''
   });
+  const [popularRoutes, setPopularRoutes] = useState([]);
 
-  const popularRoutes = [
-    { from: 'MAD', to: 'BCN', label: 'Madrid - Barcelona' },
-    { from: 'MAD', to: 'LHR', label: 'Madrid - Londres' },
-    { from: 'BCN', to: 'CDG', label: 'Barcelona - París' },
-    { from: 'MAD', to: 'FCO', label: 'Madrid - Roma' }
-  ];
+  useEffect(() => {
+    const fetchPopularRoutes = async () => {
+      try {
+        const { data } = await api.get('/routes/popular');
+        setPopularRoutes(data?.routes || []);
+      } catch (error) {
+        console.error('Error fetching popular routes:', error);
+      }
+    };
+
+    fetchPopularRoutes();
+  }, []);
 
   const handleInputChange = (field, value) => {
     setSearchData(prev => ({
@@ -83,7 +91,7 @@ const HeroSection = () => {
                 <Input
                   label="Origen"
                   type="text"
-                  placeholder="MAD, Madrid"
+                  placeholder="JFK, New York"
                   value={searchData?.origin}
                   onChange={(e) => handleInputChange('origin', e?.target?.value)}
                   className="bg-white/90 text-gray-900"
@@ -95,7 +103,7 @@ const HeroSection = () => {
                 <Input
                   label="Destino"
                   type="text"
-                  placeholder="BCN, Barcelona"
+                  placeholder="LAX, Los Angeles"
                   value={searchData?.destination}
                   onChange={(e) => handleInputChange('destination', e?.target?.value)}
                   className="bg-white/90 text-gray-900"
